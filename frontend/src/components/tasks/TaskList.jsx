@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { FiPlus, FiSearch, FiFilter, FiEye, FiTrash2, FiArrowLeft } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiFilter, FiEye, FiTrash2, FiArrowLeft, FiEdit2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const TaskList = () => {
@@ -14,6 +14,8 @@ const TaskList = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editStatus, setEditStatus] = useState('');
 
   useEffect(() => {
     fetchTasks();
@@ -22,13 +24,21 @@ const TaskList = () => {
   const fetchTasks = async () => {
     try {
       setLoading(true);
+      
+      // Build params object, excluding empty filter values
       const params = new URLSearchParams({
         page: currentPage,
-        limit: 10,
-        ...filters
+        limit: 10
       });
+      
+      // Only add filters if they have values
+      if (filters.status) params.append('status', filters.status);
+      if (filters.priority) params.append('priority', filters.priority);
+      if (filters.search) params.append('search', filters.search);
 
+      console.log('TaskList: Fetching tasks with params:', params.toString());
       const response = await axios.get(`/api/tasks?${params}`);
+      console.log('TaskList: Response received:', response.data);
       
       if (response.data && response.data.success) {
         // Handle both response formats: data.tasks or just data
@@ -36,14 +46,17 @@ const TaskList = () => {
         const totalTasks = response.data.total || (Array.isArray(tasksData) ? tasksData.length : 0);
         const pages = response.data.pages || Math.ceil(totalTasks / 10);
         
+        console.log('TaskList: Setting tasks:', tasksData.length, 'tasks');
         setTasks(Array.isArray(tasksData) ? tasksData : []);
         setTotalPages(pages || 1);
       } else {
+        console.log('TaskList: Response not successful, setting empty tasks');
         setTasks([]);
         setTotalPages(1);
       }
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      console.error('TaskList: Error fetching tasks:', error);
+      console.error('TaskList: Error response:', error.response?.data);
       
       if (error.response?.status === 401) {
         toast.error('Please login to view tasks');
@@ -63,6 +76,40 @@ const TaskList = () => {
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
+  };
+
+  const handleEditStatus = (taskId, currentStatus) => {
+    setEditingTaskId(taskId);
+    setEditStatus(currentStatus);
+  };
+
+  const handleUpdateStatus = async (taskId) => {
+    try {
+      const response = await axios.put(`/api/tasks/${taskId}`, { status: editStatus });
+      
+      if (response.data.success) {
+        toast.success('Task status updated successfully');
+        setEditingTaskId(null);
+        fetchTasks();
+      } else {
+        toast.error(response.data.message || 'Failed to update task');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      
+      if (error.response?.status === 401) {
+        toast.error('Please login to update tasks');
+      } else if (error.response?.status === 403) {
+        toast.error('You do not have permission to update this task');
+      } else {
+        toast.error('Failed to update task. Please try again.');
+      }
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTaskId(null);
+    setEditStatus('');
   };
 
   const handleDeleteTask = async (taskId) => {
@@ -258,9 +305,49 @@ const TaskList = () => {
                     </div>
                   </td>
                   <td>
-                    <span className={`status-badge ${getStatusColor(task.status)}`}>
-                      {task.status}
-                    </span>
+                    {editingTaskId === task._id ? (
+                      <div className="status-edit-group">
+                        <select
+                          value={editStatus}
+                          onChange={(e) => setEditStatus(e.target.value)}
+                          className="status-select"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="in-progress">In Progress</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                        <div className="status-edit-actions">
+                          <button
+                            onClick={() => handleUpdateStatus(task._id)}
+                            className="btn-save"
+                            title="Save"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="btn-cancel"
+                            title="Cancel"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="status-display-group">
+                        <span className={`status-badge ${getStatusColor(task.status)}`}>
+                          {task.status}
+                        </span>
+                        <button
+                          onClick={() => handleEditStatus(task._id, task.status)}
+                          className="btn-edit-status"
+                          title="Edit Status"
+                        >
+                          <FiEdit2 />
+                        </button>
+                      </div>
+                    )}
                   </td>
                   <td>
                     <span className={`priority-badge ${getPriorityColor(task.priority)}`}>

@@ -70,9 +70,9 @@ input:focus, textarea:focus, select:focus {
 
 .input-icon {
   position: absolute;
-  left: 1rem;
+  left: 0.75rem;
   color: var(--color-gray-400);
-  font-size: 1.1rem;
+  font-size: 1rem;
   pointer-events: none;
   z-index: 1;
 }

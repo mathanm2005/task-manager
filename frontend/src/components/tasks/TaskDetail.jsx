@@ -37,11 +37,16 @@ const TaskDetail = () => {
 
   const fetchTasks = async () => {
     try {
+      // Build params object, excluding empty filter values
       const params = new URLSearchParams({
         page: currentPage,
-        limit: 10,
-        ...filters
+        limit: 10
       });
+      
+      // Only add filters if they have values
+      if (filters.status) params.append('status', filters.status);
+      if (filters.priority) params.append('priority', filters.priority);
+      if (filters.search) params.append('search', filters.search);
 
       const response = await axios.get(`/api/tasks?${params}`);
       

@@ -260,6 +260,114 @@
   gap: var(--space-2);
 }
 
+/* Status Edit Controls */
+.status-edit-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.status-display-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.status-select {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.status-edit-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+}
+
+.btn-save {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #059669;
+}
+
+.btn-cancel {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-700);
+}
+
+.btn-cancel:hover {
+  background-color: var(--color-gray-300);
+}
+
+.btn-edit-status {
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit-status:hover {
+  color: var(--color-primary-600);
+  background-color: var(--color-gray-100);
+}
+
+.btn-edit-status svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 768px) {
+  .status-edit-group {
+    width: 100%;
+  }
+  
+  .status-select {
+    width: 100%;
+  }
+  
+  .status-edit-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 .tag {
   background: rgba(37, 99, 235, 0.1);
   color: var(--color-primary);

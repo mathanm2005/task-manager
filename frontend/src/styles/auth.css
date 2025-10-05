@@ -104,12 +104,12 @@
 }
 
 .auth-form .form-input {
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
 }
 
 @media (max-width: 480px) {
   .auth-form .form-input {
-    padding: 0.6875rem 0.875rem 0.6875rem 2.25rem;
+    padding: 0.6875rem 0.875rem 0.6875rem 2.5rem;
     font-size: 1rem;
   }
 }

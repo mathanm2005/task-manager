@@ -25,17 +25,22 @@ const Dashboard = () => {
       // Try to fetch tasks, but don't fail if it doesn't work
       let tasks = [];
       try {
+        console.log('Dashboard: Fetching tasks...');
         const response = await axios.get('/api/tasks');
+        console.log('Dashboard: Response received:', response.data);
         
        
         if (response.data.success) {
           // Backend server format
           tasks = response.data.data || [];
+          console.log('Dashboard: Using backend format, tasks:', tasks.length);
         } else if (response.data.tasks) {
           // Frontend server format
           tasks = response.data.tasks || [];
+          console.log('Dashboard: Using frontend format, tasks:', tasks.length);
         } else {
           tasks = [];
+          console.log('Dashboard: No tasks found in response');
         }
         
       } catch (apiError) {
