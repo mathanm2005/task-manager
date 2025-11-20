@@ -154,7 +154,20 @@ router.post('/', protect, [
   body('tags')
     .optional()
     .isArray()
-    .withMessage('Tags must be an array')
+    .withMessage('Tags must be an array'),
+  body('subtasks')
+    .optional()
+    .isArray()
+    .withMessage('Subtasks must be an array'),
+  body('subtasks.*.title')
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Each subtask must have a title (1-100 chars)'),
+  body('subtasks.*.completed')
+    .optional()
+    .isBoolean()
+    .withMessage('Subtask completed must be a boolean')
 ], asyncHandler(async (req, res) => {
   // Check for validation errors
   const errors = validationResult(req);
@@ -166,7 +179,7 @@ router.post('/', protect, [
     });
   }
 
-  const { title, description, dueDate, assignedTo, priority, tags } = req.body;
+  const { title, description, dueDate, assignedTo, priority, tags, subtasks } = req.body;
 
   // Check if assigned user exists (only if assignedTo is provided)
   if (assignedTo) {
@@ -194,7 +207,14 @@ router.post('/', protect, [
     assignedTo: assignedTo || undefined,
     createdBy: req.user._id,
     priority: priority || 'medium',
-    tags: tags || []
+    tags: tags || [],
+    subtasks: Array.isArray(subtasks)
+      ? subtasks.map(st => ({
+          title: st.title,
+          completed: !!st.completed,
+          completedAt: st.completed ? new Date() : undefined
+        }))
+      : []
   });
 
   // Populate the created task
@@ -239,7 +259,20 @@ router.put('/:id', protect, [
   body('assignedTo')
     .optional()
     .isMongoId()
-    .withMessage('Please provide a valid user ID')
+    .withMessage('Please provide a valid user ID'),
+  body('subtasks')
+    .optional()
+    .isArray()
+    .withMessage('Subtasks must be an array'),
+  body('subtasks.*.title')
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Each subtask must have a title (1-100 chars)'),
+  body('subtasks.*.completed')
+    .optional()
+    .isBoolean()
+    .withMessage('Subtask completed must be a boolean')
 ], asyncHandler(async (req, res) => {
   // Check for validation errors
   const errors = validationResult(req);
@@ -262,7 +295,7 @@ router.put('/:id', protect, [
 
   // Check if user has permission to update this task
   if (req.user.role !== 'admin' && 
-      task.assignedTo.toString() !== req.user._id.toString() && 
+      task.assignedTo?.toString() !== req.user._id.toString() && 
       task.createdBy.toString() !== req.user._id.toString()) {
     return res.status(403).json({
       success: false,
@@ -287,6 +320,15 @@ router.put('/:id', protect, [
       success: false,
       message: 'Due date cannot be in the past'
     });
+  }
+
+  // Normalize subtasks payload if provided
+  if (Array.isArray(req.body.subtasks)) {
+    req.body.subtasks = req.body.subtasks.map(st => ({
+      title: st.title,
+      completed: !!st.completed,
+      completedAt: st.completed ? new Date() : undefined
+    }));
   }
 
   // Update task

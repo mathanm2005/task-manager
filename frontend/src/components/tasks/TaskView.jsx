@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { FiArrowLeft, FiTrash2, FiMessageSquare, FiCalendar, FiUser, FiTag } from 'react-icons/fi';
+import { FiArrowLeft, FiTrash2, FiMessageSquare, FiCalendar, FiUser, FiTag, FiCheckSquare, FiSquare } from 'react-icons/fi';
 import axios from 'axios';
 
 const TaskView = () => {
@@ -74,6 +74,26 @@ const TaskView = () => {
       toast.error('Failed to add comment');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleToggleSubtask = async (subtaskIndex) => {
+    try {
+      const updatedSubtasks = task.subtasks.map((st, idx) => 
+        idx === subtaskIndex ? { ...st, completed: !st.completed } : st
+      );
+      
+      const response = await axios.put(`/api/tasks/${id}`, { subtasks: updatedSubtasks });
+      
+      if (response.data.success) {
+        setTask(response.data.data);
+        toast.success('Subtask updated successfully');
+      } else {
+        toast.error(response.data.message || 'Failed to update subtask');
+      }
+    } catch (error) {
+      console.error('Error updating subtask:', error);
+      toast.error('Failed to update subtask');
     }
   };
 
@@ -213,6 +233,32 @@ const TaskView = () => {
             </div>
           )}
         </div>
+
+        {task.subtasks && task.subtasks.length > 0 && (
+          <div className="task-subtasks-section">
+            <h3>Subtasks</h3>
+            <div className="subtasks-list">
+              {task.subtasks.map((subtask, index) => (
+                <div key={index} className="subtask-item">
+                  <button
+                    onClick={() => handleToggleSubtask(index)}
+                    className="subtask-checkbox"
+                    title={subtask.completed ? 'Mark as incomplete' : 'Mark as complete'}
+                  >
+                    {subtask.completed ? (
+                      <FiCheckSquare className="checked" />
+                    ) : (
+                      <FiSquare />
+                    )}
+                  </button>
+                  <span className={`subtask-title ${subtask.completed ? 'completed' : ''}`}>
+                    {subtask.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="task-status-section">
           <h3>Update Status</h3>

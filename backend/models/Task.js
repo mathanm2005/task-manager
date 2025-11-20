@@ -40,6 +40,21 @@ const taskSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  subtasks: [{
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: [100, 'Subtask title cannot be more than 100 characters']
+    },
+    completed: {
+      type: Boolean,
+      default: false
+    },
+    completedAt: {
+      type: Date
+    }
+  }],
   attachments: [{
     filename: String,
     originalName: String,

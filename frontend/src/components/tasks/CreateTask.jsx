@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { FiSave, FiX, FiUser, FiCalendar, FiTag, FiArrowLeft } from 'react-icons/fi';
+import { FiSave, FiX, FiUser, FiCalendar, FiTag, FiArrowLeft, FiPlus } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const CreateTask = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addTaskCreatedNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     dueDate: '',
     priority: 'medium',
-    tags: []
+    tags: [],
+    subtasks: []
   });
   const [errors, setErrors] = useState({});
 
@@ -114,6 +117,49 @@ const CreateTask = () => {
     }));
   };
 
+  // Subtasks handlers
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+
+  const addSubtask = () => {
+    const title = newSubtaskTitle.trim();
+    if (!title) return;
+    setFormData(prev => ({
+      ...prev,
+      subtasks: [...(prev.subtasks || []), { title, completed: false }]
+    }));
+    setNewSubtaskTitle('');
+  };
+
+  const handleSubtaskKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addSubtask();
+    }
+  };
+
+  const updateSubtaskTitle = (index, title) => {
+    setFormData(prev => {
+      const list = [...(prev.subtasks || [])];
+      list[index] = { ...list[index], title };
+      return { ...prev, subtasks: list };
+    });
+  };
+
+  const toggleSubtaskCompleted = (index) => {
+    setFormData(prev => {
+      const list = [...(prev.subtasks || [])];
+      list[index] = { ...list[index], completed: !list[index].completed };
+      return { ...prev, subtasks: list };
+    });
+  };
+
+  const removeSubtask = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      subtasks: (prev.subtasks || []).filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -129,7 +175,10 @@ const CreateTask = () => {
         description: formData.description,
         dueDate: formData.dueDate,
         priority: formData.priority,
-        tags: formData.tags
+        tags: formData.tags,
+        subtasks: (formData.subtasks || [])
+          .map(st => ({ title: (st.title || '').trim(), completed: !!st.completed }))
+          .filter(st => st.title.length > 0)
       };
       
       console.log('Creating task with payload:', payload);
@@ -141,7 +190,14 @@ const CreateTask = () => {
       
       // Handle both response formats (backend and frontend server)
       if (response.data.success || response.data.message === 'Task created successfully') {
+        const createdTask = response.data.data;
         toast.success('Task created successfully!');
+        
+        // Add notification for the created task
+        if (createdTask) {
+          addTaskCreatedNotification(createdTask);
+        }
+        
         navigate('/tasks');
       } else {
         console.error('Unexpected response format:', response.data);
@@ -272,6 +328,56 @@ const CreateTask = () => {
                     <FiX />
                   </button>
                 </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Subtasks Section */}
+        <div className="form-group">
+          <label>Subtasks</label>
+          <div className="subtasks-input-row">
+            <input
+              type="text"
+              value={newSubtaskTitle}
+              onChange={(e) => setNewSubtaskTitle(e.target.value)}
+              onKeyDown={handleSubtaskKeyPress}
+              placeholder="Type a subtask and press Enter or click Add"
+              className="form-input"
+            />
+            <button type="button" className="btn-secondary" onClick={addSubtask}>
+              <FiPlus /> Add
+            </button>
+          </div>
+
+          {(formData.subtasks || []).length > 0 && (
+            <div className="subtasks-list">
+              {formData.subtasks.map((st, idx) => (
+                <div key={idx} className="subtask-item">
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={!!st.completed}
+                      onChange={() => toggleSubtaskCompleted(idx)}
+                    />
+                    <span></span>
+                  </label>
+                  <input
+                    type="text"
+                    value={st.title}
+                    onChange={(e) => updateSubtaskTitle(idx, e.target.value)}
+                    className="form-input subtask-title-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSubtask(idx)}
+                    className="icon-button"
+                    aria-label="Remove subtask"
+                    title="Remove subtask"
+                  >
+                    <FiX />
+                  </button>
+                </div>
               ))}
             </div>
           )}

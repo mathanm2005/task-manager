@@ -2,11 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import Dashboard from './components/dashboard/Dashboard';
 import TaskList from './components/tasks/TaskList';
 import TaskDetail from './components/tasks/TaskDetail';
 import TaskView from './components/tasks/TaskView';
 import CreateTask from './components/tasks/CreateTask';
+import TaskCalendar from './components/tasks/TaskCalendar';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -23,6 +25,7 @@ import './styles/navigation.css';
 import './styles/dashboard.css';
 import './styles/tasks.css';
 import './styles/profile.css';
+import './styles/notifications.css';
 
 function AppContent() {
   const location = useLocation();
@@ -52,6 +55,7 @@ function AppContent() {
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/tasks" element={<ProtectedRoute><TaskDetail /></ProtectedRoute>} />
           <Route path="/tasks/create" element={<ProtectedRoute><CreateTask /></ProtectedRoute>} />
+          <Route path="/tasks/calendar" element={<ProtectedRoute><TaskCalendar /></ProtectedRoute>} />
           <Route path="/tasks/:id" element={<ProtectedRoute><TaskView /></ProtectedRoute>} />
         </Routes>
       </main>
@@ -62,9 +66,11 @@ function AppContent() {
 function AppWrapper() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <NotificationProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

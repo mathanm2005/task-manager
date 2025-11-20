@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiHome, FiList, FiPlus, FiUser, FiLogOut, FiSettings, FiShield, FiUsers } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiList, FiPlus, FiUser, FiLogOut, FiSettings, FiShield, FiUsers, FiCalendar } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
+import NotificationDropdown from '../notifications/NotificationDropdown';
 import axios from 'axios';
 
 const Navbar = () => {
@@ -94,6 +95,14 @@ const Navbar = () => {
                 <span>Create Task</span>
               </Link>
 
+              <Link 
+                to="/tasks/calendar" 
+                className={`navbar-link ${isActive('/tasks/calendar') ? 'active' : ''}`}
+              >
+                <FiCalendar />
+                <span>Task Calendar</span>
+              </Link>
+
               {isAdmin && (
                 <>
                   <Link 
@@ -164,6 +173,7 @@ const Navbar = () => {
 
         {user && (
           <div className="navbar-user">
+            <NotificationDropdown />
             <div className="user-menu" ref={userMenuRef}>
               <button
                 className="user-menu-button"
@@ -252,6 +262,15 @@ const Navbar = () => {
               >
                 <FiPlus />
                 <span>Create Task</span>
+              </Link>
+
+              <Link 
+                to="/tasks/calendar" 
+                className={`mobile-link ${isActive('/tasks/calendar') ? 'active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <FiCalendar />
+                <span>Task Calendar</span>
               </Link>
 
               {isAdmin && (
