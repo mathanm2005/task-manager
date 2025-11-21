@@ -175,6 +175,8 @@
   top: 0;
   z-index: 100;
   width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .navbar-container {
@@ -184,8 +186,9 @@
   align-items: center;
   justify-content: space-between;
   height: 70px;
-  max-width: var(--container-2xl);
+  max-width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
@@ -217,7 +220,16 @@
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: var(--space-8);
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .navbar-menu {
+    gap: var(--space-4);
+  }
 }
 
 @media (max-width: 768px) {
