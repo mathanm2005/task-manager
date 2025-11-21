@@ -49,8 +49,6 @@ const TaskCalendar = () => {
         }
       }
 
-      console.log('Total tasks fetched:', allTasks.length);
-
       // Group tasks by month
       const monthCounts = {};
       const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -74,8 +72,6 @@ const TaskCalendar = () => {
         }
       });
 
-      console.log('Monthly data:', monthCounts);
-      console.log('Total tasks in year:', Object.values(monthCounts).reduce((sum, m) => sum + m.count, 0));
       setMonthlyData(monthCounts);
     } catch (error) {
       console.error('Error fetching monthly task data:', error);
@@ -120,9 +116,8 @@ const TaskCalendar = () => {
     );
   }
 
-  // Calculate total tasks for debugging
+  // Calculate total tasks
   const totalTasks = Object.values(monthlyData).reduce((sum, m) => sum + (m?.count || 0), 0);
-  console.log('Rendering with total tasks:', totalTasks, 'monthlyData:', monthlyData);
 
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                       'July', 'August', 'September', 'October', 'November', 'December'];
@@ -226,7 +221,6 @@ const TaskCalendar = () => {
           <div className="stat-value">
             {(() => {
               const total = Object.values(monthlyData).reduce((sum, m) => sum + (m?.count || 0), 0);
-              console.log('Calculating total:', total);
               return total;
             })()}
           </div>

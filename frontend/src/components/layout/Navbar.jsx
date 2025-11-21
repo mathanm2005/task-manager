@@ -18,13 +18,13 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
   const isAdmin = user?.role === 'admin';
 
-  // Debug logging
-  console.log('Navbar Debug:', {
-    user,
-    userRole: user?.role,
-    isAdmin,
-    location: location.pathname
-  });
+  // Debug logging (commented out for production)
+  // console.log('Navbar Debug:', {
+  //   user,
+  //   userRole: user?.role,
+  //   isAdmin,
+  //   location: location.pathname
+  // });
 
   // Fetch recent users for admin
   useEffect(() => {
