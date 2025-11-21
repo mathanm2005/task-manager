@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiHome, FiList, FiPlus, FiUser, FiLogOut, FiSettings, FiShield, FiUsers, FiCalendar } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiList, FiPlus, FiUser, FiLogOut, FiSettings, FiShield, FiUsers, FiCalendar, FiArrowLeft } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationDropdown from '../notifications/NotificationDropdown';
 import axios from 'axios';
@@ -112,6 +112,17 @@ const Navbar = () => {
                     <FiShield />
                     <span>Admin</span>
                   </Link>
+
+                  {isActive('/admin') && (
+                    <Link 
+                      to="/dashboard" 
+                      className="navbar-link"
+                      title="Back to Dashboard"
+                    >
+                      <FiArrowLeft />
+                      <span>Back</span>
+                    </Link>
+                  )}
                   
                   <div className="registrations-menu" ref={registrationsRef}>
                     <button
@@ -274,14 +285,27 @@ const Navbar = () => {
               </Link>
 
               {isAdmin && (
-                <Link 
-                  to="/admin" 
-                  className={`mobile-link ${isActive('/admin') ? 'active' : ''}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <FiShield />
-                  <span>Admin Panel</span>
-                </Link>
+                <>
+                  <Link 
+                    to="/admin" 
+                    className={`mobile-link ${isActive('/admin') ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <FiShield />
+                    <span>Admin Panel</span>
+                  </Link>
+
+                  {isActive('/admin') && (
+                    <Link 
+                      to="/dashboard" 
+                      className="mobile-link"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <FiArrowLeft />
+                      <span>Back to Dashboard</span>
+                    </Link>
+                  )}
+                </>
               )}
 
               <div className="mobile-user-actions">
