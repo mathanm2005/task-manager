@@ -184,9 +184,11 @@ input:focus, textarea:focus, select:focus {
   position: sticky;
   top: 0;
   z-index: 100;
-  width: 100vw;
+  width: 100%;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .navbar-container {
@@ -197,6 +199,7 @@ input:focus, textarea:focus, select:focus {
   justify-content: space-between;
   height: 70px;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .navbar-brand {
@@ -214,7 +217,10 @@ input:focus, textarea:focus, select:focus {
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: center;
 }
 
 .navbar-link {
